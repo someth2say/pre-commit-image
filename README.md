@@ -1,0 +1,1 @@
+Docker image for running GLS pre-commit hooks.
