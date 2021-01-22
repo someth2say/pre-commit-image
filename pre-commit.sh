@@ -13,7 +13,7 @@ pcommit_cache=~/.cache/pre-commit
 
 # CONSTANTS: DO NOT TOUCH
 # Container image.
-image=pre-commit:latest
+image=quay.io/redhattraining/pre-commit:latest
 
 book=$(pwd)
 
@@ -36,10 +36,13 @@ fi
 # Execute container image
 podman run --name ${container_name} -ti \
      -v ${book}:${container_book}:z \
-     -v ${ssh_cfg_cpy}:${container_ssh_cfg}:z \
+     -v ${ssh_cfg_cpy}:${container_ssh_cfg}:z,ro \
      -v ${pcommit_cache}:${container_pcommit_cache}:z \
-     ${image} $@
+     ${image} "$@"
+exitcode=$?
 
 # Cleanup 
 rm -rf ${ssh_cfg_cpy}
 podman rm -f ${container_name} > /dev/null
+
+exit $exitcode
