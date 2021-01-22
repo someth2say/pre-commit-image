@@ -33,8 +33,16 @@ if [ ! -d $pcommit_cache ]; then
   mkdir -p $pcommit_cache;
 fi
 
+### Helper functions
+function has() {
+  curl -sL https://git.io/_has | bash -s $1 > /dev/null
+  return $?
+}
+
 # Execute container image
-podman run --name ${container_name} -ti \
+has "podman" && command="podman" || has "docker" && command="docker"
+
+$command run --name ${container_name} -ti \
      -v ${book}:${container_book}:z \
      -v ${ssh_cfg_cpy}:${container_ssh_cfg}:z,ro \
      -v ${pcommit_cache}:${container_pcommit_cache}:z \
@@ -43,6 +51,6 @@ exitcode=$?
 
 # Cleanup 
 rm -rf ${ssh_cfg_cpy}
-podman rm -f ${container_name} > /dev/null
+$command rm -f ${container_name} > /dev/null
 
 exit $exitcode
